@@ -1,6 +1,6 @@
 'use strict';
 
-window.Game = (function () {
+window.Game = (function() {
   /**
    * @const
    * @type {number}
@@ -83,7 +83,7 @@ window.Game = (function () {
    * @param {Object} state
    * @param {number} timeframe
    */
-  ObjectsBehaviour[ObjectType.ME] = function (object, state, timeframe) {
+  ObjectsBehaviour[ObjectType.ME] = function(object, state, timeframe) {
     // Пока зажата стрелка вверх, маг сначала поднимается, а потом левитирует
     // в воздухе на определенной высоте.
     // NB! Сложность заключается в том, что поведение описано в координатах
@@ -154,7 +154,7 @@ window.Game = (function () {
    * @param {Object} state
    * @param {number} timeframe
    */
-  ObjectsBehaviour[ObjectType.FIREBALL] = function (object, state, timeframe) {
+  ObjectsBehaviour[ObjectType.FIREBALL] = function(object, state, timeframe) {
     if (object.direction & Direction.LEFT) {
       object.x -= object.speed * timeframe;
     }
@@ -197,8 +197,8 @@ window.Game = (function () {
    * @param {Object} state
    * @return {Verdict}
    */
-  LevelsRules[Level.INTRO] = function (state) {
-    var fireballs = state.garbage.filter(function (object) {
+  LevelsRules[Level.INTRO] = function(state) {
+    var fireballs = state.garbage.filter(function(object) {
       return object.type === ObjectType.FIREBALL;
     });
 
@@ -216,7 +216,7 @@ window.Game = (function () {
    * @param {Object} state
    * @return {Object}
    */
-  LevelsInitialize[Level.INTRO] = function (state) {
+  LevelsInitialize[Level.INTRO] = function(state) {
     state.objects.push(
       // Установка персонажа в начальное положение. Он стоит в крайнем левом
       // углу экрана, глядя вправо. Скорость перемещения персонажа на этом
@@ -244,7 +244,7 @@ window.Game = (function () {
    * @param {Element} container
    * @constructor
    */
-  var Game = function (container) {
+  var Game = function(container) {
     this.container = container;
     this.canvas = document.createElement('canvas');
     this.canvas.width = container.clientWidth;
@@ -268,7 +268,7 @@ window.Game = (function () {
     level: INITIAL_LEVEL,
 
     /** @param {boolean} deactivated */
-    setDeactivated: function (deactivated) {
+    setDeactivated: function(deactivated) {
       if (this._deactivated === deactivated) {
         return;
       }
@@ -287,7 +287,7 @@ window.Game = (function () {
      * и время проведенное на уровне и в игре.
      * @return {Object}
      */
-    getInitialState: function () {
+    getInitialState: function() {
       return {
         // Статус игры. Если CONTINUE, то игра продолжается.
         currentStatus: Verdict.CONTINUE,
@@ -323,7 +323,7 @@ window.Game = (function () {
      * @param {Level=} level
      * @param {boolean=} restart
      */
-    initializeLevelAndStart: function (level, restart) {
+    initializeLevelAndStart: function(level, restart) {
       level = typeof level === 'undefined' ? this.level : level;
       restart = typeof restart === 'undefined' ? true : restart;
 
@@ -344,7 +344,7 @@ window.Game = (function () {
         this.state.startTime = this.state.levelStartTime;
       }
 
-      this._preloadImagesForLevel(function () {
+      this._preloadImagesForLevel(function() {
         // Предварительная отрисовка игрового экрана.
         this.render();
 
@@ -360,7 +360,7 @@ window.Game = (function () {
      * Временная остановка игры.
      * @param {Verdict=} verdict
      */
-    pauseLevel: function (verdict) {
+    pauseLevel: function(verdict) {
       if (verdict) {
         this.state.currentStatus = verdict;
       }
@@ -380,7 +380,7 @@ window.Game = (function () {
      * @private
      * @private
      */
-    _pauseListener: function (evt) {
+    _pauseListener: function(evt) {
       if (evt.keyCode === 32 && !this._deactivated) {
         evt.preventDefault();
         var needToRestartTheGame = this.state.currentStatus === Verdict.WIN ||
@@ -394,86 +394,17 @@ window.Game = (function () {
     /**
      * Отрисовка экрана паузы.
      */
-    _drawPauseScreen: function () {
+    _drawPauseScreen: function() {
+
       /**
        * блок с переменными
        */
-
-      var self = this;
-
-      var rectWidth = 500;
-      var rectHeight = 200;
-      var rectX = 100; // X-координата начала
-      var rectY = 45; // Y-координата начала
-
-      var offsetX = 10; // смещение по X-координате
-      var offsetY = 10; // смещение по Y-координате
-
       var messagesList = {
-        'win': [
-          'Ты победил! Но запомни:',
-          'дискретность индуктивно',
-          'дискредитирует дедуктивный метод'
-        ],
-        'fail': [
-          'Ты проиграл!',
-          'Народная мудрость в утешение:',
-          '"Реальность осмысленно транспонирует',
-          'субъективный катарсис"'
-        ],
-        'pause': [
-          'Пока игра поставленана паузу,',
-          'обратимся к цитатам великих:',
-          '"Структурализм, по определению,',
-          'понимает под собой знак"'
-        ],
-        'intro': [
-          'Я умею перемещаться',
-          'и летать по нажатию на стрелки.',
-          'А если нажать Shift,',
-          'я выстрелю файерволом!',
-          'И помни: предмет деятельности',
-          'амбивалентно творит',
-          'сенсибельный гравитационный парадокс'
-        ]
+        'win': 'Ты победил! Но запомни: дискретность индуктивно дискредитирует дедуктивный метод',
+        'fail': 'Ты проиграл! Народная мудрость в утешение: "Реальность осмысленно транспонирует субъективный катарсис"',
+        'pause': 'Пока игра поставлена на паузу, обратимся к цитатам великих: "Структурализм, по определению, понимает под собой знак"',
+        'intro': 'Я умею перемещаться и летать по нажатию на стрелки. А если нажать Shift, я выстрелю файерволом! И помни: предмет деятельности амбивалентно творит сенсибельный гравитационный парадокс'
       };
-
-      var fontSize = 16;
-      var lineHeight = fontSize * 1.2;
-
-      /**
-       * функция отрисовывания диалогового окна:
-       */
-      function createRect(x, y, width, height) {
-        // 1. тень от прямоугольника
-        self.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        self.ctx.fillRect(x + offsetX, y + offsetY, width, height);
-
-        // 2. прямоугольник: обводка
-        self.ctx.strokeStyle = '#000';
-        self.ctx.lineWidth = 5;
-        self.ctx.strokeRect(x, y, width, height);
-
-        // 3. прямоугольник: заливка
-        self.ctx.fillStyle = '#fff';
-        self.ctx.fillRect(x, y, width, height);
-      }
-
-      createRect(rectX, rectY, rectWidth, rectHeight);
-
-      /**
-       * функция вывода сообщения на холст
-       */
-      function createMessage(element) {
-        // параметры шрифта
-        self.ctx.font = '16px PT Mono, serif';
-        self.ctx.textAlign = 'center';
-        self.ctx.textBaseline = 'hanging';
-        self.ctx.fillStyle = '#000';
-
-        self.ctx.fillText(element, rectX + rectWidth / 2, rectY + rectHeight / 3);
-        rectY += lineHeight;
-      }
 
       var message;
       switch (this.state.currentStatus) {
@@ -493,8 +424,117 @@ window.Game = (function () {
           message = messagesList.intro;
           break;
       }
-      message.forEach(createMessage);
 
+      this._drawMessage(message);
+
+    },
+    /**
+     * Отрисовка диалогового окна с сообщением
+     * @param {String[]} message текст собщения
+     */
+    _drawMessage: function(message) {
+
+      /**
+       * параметры шрифта для корректного вычисления константы SYMBOL_WIDTH
+       */
+      this.ctx.font = '16px PT Mono, serif';
+
+      /**
+       * блок с переменными
+       */
+      var self = this;
+
+      var rectWidth = 300;
+      var rectX = 300; // X-координата начала
+      var rectY = 50; // Y-координата начала
+
+      var padding = 10; // смещение по X-и Y- координатам
+
+      var fontSize = 16;
+      var lineHeight = fontSize * 1.2;
+
+      // вычисляем ширину символа
+      var SYMBOL_WIDTH = self.ctx.measureText('M').width;
+
+      // вычисляем ширину сообщения с учетом отступов
+      var messageLength = (rectWidth - (padding * 2)) / SYMBOL_WIDTH;
+
+      var transformStringIntoArray = splitText(message, messageLength);
+
+      var messageHeight = transformStringIntoArray.length * lineHeight;
+
+      /**
+       * Функция отрисовывания диалогового окна:
+       * @param {Number} x координата левого верхнего угла по оси x
+       * @param {Number} y координата левого верхнего угла по оси y
+       * @param {Number} width ширина прямоугольника
+       * @param {Number} height высота прямоугольника
+       */
+      function createRect(x, y, width, height) {
+        // 1. тень от прямоугольника
+        self.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        self.ctx.fillRect(x + padding, y + padding, width, height);
+
+        // 2. прямоугольник: обводка
+        self.ctx.strokeStyle = '#000';
+        self.ctx.lineWidth = 5;
+        self.ctx.strokeRect(x, y, width, height);
+
+        // 3. прямоугольник: заливка
+        self.ctx.fillStyle = '#fff';
+        self.ctx.fillRect(x, y, width, height);
+      }
+
+      createRect(rectX, rectY, rectWidth, messageHeight + padding * 2);
+
+      /**
+       * Функция вывода сообщения на холст.
+       * @param {String} element Строка, которая передается ctx-объекту fillText
+       */
+      function createMessage(element) {
+        // параметры шрифта
+        self.ctx.textAlign = 'center';
+        self.ctx.textBaseline = 'top';
+        self.ctx.fillStyle = '#000';
+
+        self.ctx.fillText(element, rectX + rectWidth / 2, rectY + padding );
+        rectY += lineHeight;
+      }
+
+      /**
+       * Функция создания из строки массива заданной ширины:
+       * @param {String} str строка, которую необходимо преобразовать в массив
+       * @param {Number} len число, ограничивающее длину эл-та в массиве
+       * @returns {Array}
+       */
+      function splitText(str, len) {
+        var arr = [];
+
+        str = str.split(' ');
+
+        var result = str.reduce(function(sum, el) {
+
+          if (( sum.length + el.length ) <= len) {
+            return sum + ' ' + el;
+          }
+
+          arr.push(sum);
+          sum = el;
+
+          return sum;
+
+        });
+
+        arr.push(result);
+
+        return arr;
+      }
+
+      // для каждой строки, записанной в виде строкового значения в объект messagesList,
+      // вызываем функцию splitText, после чего на каждой приведенной к массиву строке
+      // вызываем метод forEach, который в свою очередь возвращает callback-функцию,
+      // генерирующее сообщение на холсте
+      transformStringIntoArray.forEach(createMessage);
     },
 
     /**
@@ -502,7 +542,7 @@ window.Game = (function () {
      * @param {function} callback
      * @private
      */
-    _preloadImagesForLevel: function (callback) {
+    _preloadImagesForLevel: function(callback) {
       if (typeof this._imagesArePreloaded === 'undefined') {
         this._imagesArePreloaded = [];
       }
@@ -513,7 +553,7 @@ window.Game = (function () {
       }
 
       var levelImages = [];
-      this.state.objects.forEach(function (object) {
+      this.state.objects.forEach(function(object) {
         levelImages.push(object.sprite);
 
         if (object.spriteReversed) {
@@ -527,7 +567,7 @@ window.Game = (function () {
       while (i-- > 0) {
         var image = new Image();
         image.src = levelImages[i];
-        image.onload = function () {
+        image.onload = function() {
           if (--imagesToGo === 0) {
             this._imagesArePreloaded[this.level] = true;
             callback();
@@ -542,9 +582,9 @@ window.Game = (function () {
      * должны исчезнуть.
      * @param {number} delta Время, прошеднее с отрисовки прошлого кадра.
      */
-    updateObjects: function (delta) {
+    updateObjects: function(delta) {
       // Персонаж.
-      var me = this.state.objects.filter(function (object) {
+      var me = this.state.objects.filter(function(object) {
         return object.type === ObjectType.ME;
       })[0];
 
@@ -567,7 +607,7 @@ window.Game = (function () {
       this.state.garbage = [];
 
       // Убирает в garbage не используемые на карте объекты.
-      var remainingObjects = this.state.objects.filter(function (object) {
+      var remainingObjects = this.state.objects.filter(function(object) {
         ObjectsBehaviour[object.type](object, this.state, delta);
 
         if (object.state === ObjectState.DISPOSED) {
@@ -584,7 +624,7 @@ window.Game = (function () {
     /**
      * Проверка статуса текущего уровня.
      */
-    checkStatus: function () {
+    checkStatus: function() {
       // Нет нужны запускать проверку, нужно ли останавливать уровень, если
       // заранее известно, что да.
       if (this.state.currentStatus !== Verdict.CONTINUE) {
@@ -602,8 +642,8 @@ window.Game = (function () {
            * @param {Object} state
            * @return {Verdict}
            */
-            function checkDeath(state) {
-            var me = state.objects.filter(function (object) {
+          function checkDeath(state) {
+            var me = state.objects.filter(function(object) {
               return object.type === ObjectType.ME;
             })[0];
 
@@ -617,7 +657,7 @@ window.Game = (function () {
            * @param {Object} state
            * @return {Verdict}
            */
-            function checkKeys(state) {
+          function checkKeys(state) {
             return state.keysPressed.ESC ? Verdict.PAUSE : Verdict.CONTINUE;
           },
 
@@ -626,7 +666,7 @@ window.Game = (function () {
            * @param {Object} state
            * @return {Verdict}
            */
-            function checkTime(state) {
+          function checkTime(state) {
             return Date.now() - state.startTime > 3 * 60 * 1000 ?
               Verdict.FAIL :
               Verdict.CONTINUE;
@@ -658,7 +698,7 @@ window.Game = (function () {
      * экран.
      * @param {Verdict} status
      */
-    setGameStatus: function (status) {
+    setGameStatus: function(status) {
       if (this.state.currentStatus !== status) {
         this.state.currentStatus = status;
       }
@@ -667,13 +707,13 @@ window.Game = (function () {
     /**
      * Отрисовка всех объектов на экране.
      */
-    render: function () {
+    render: function() {
       // Удаление всех отрисованных на странице элементов.
       this.ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
       // Выставление всех элементов, оставшихся в this.state.objects согласно
       // их координатам и направлению.
-      this.state.objects.forEach(function (object) {
+      this.state.objects.forEach(function(object) {
         if (object.sprite) {
           var image = new Image(object.width, object.height);
           image.src = (object.spriteReversed && object.direction & Direction.LEFT) ?
@@ -690,7 +730,7 @@ window.Game = (function () {
      * проверку текущего раунда. Рекурсивно продолжается до тех пор, пока
      * проверка не вернет состояние FAIL, WIN или PAUSE.
      */
-    update: function () {
+    update: function() {
       if (!this.state.lastUpdated) {
         this.state.lastUpdated = Date.now();
       }
@@ -703,7 +743,7 @@ window.Game = (function () {
         case Verdict.CONTINUE:
           this.state.lastUpdated = Date.now();
           this.render();
-          requestAnimationFrame(function () {
+          requestAnimationFrame(function() {
             this.update();
           }.bind(this));
           break;
@@ -721,7 +761,7 @@ window.Game = (function () {
      * @param {KeyboardEvent} evt [description]
      * @private
      */
-    _onKeyDown: function (evt) {
+    _onKeyDown: function(evt) {
       switch (evt.keyCode) {
         case 37:
           this.state.keysPressed.LEFT = true;
@@ -746,7 +786,7 @@ window.Game = (function () {
      * @param {KeyboardEvent} evt [description]
      * @private
      */
-    _onKeyUp: function (evt) {
+    _onKeyUp: function(evt) {
       switch (evt.keyCode) {
         case 37:
           this.state.keysPressed.LEFT = false;
@@ -768,13 +808,13 @@ window.Game = (function () {
     },
 
     /** @private */
-    _initializeGameListeners: function () {
+    _initializeGameListeners: function() {
       window.addEventListener('keydown', this._onKeyDown);
       window.addEventListener('keyup', this._onKeyUp);
     },
 
     /** @private */
-    _removeGameListeners: function () {
+    _removeGameListeners: function() {
       window.removeEventListener('keydown', this._onKeyDown);
       window.removeEventListener('keyup', this._onKeyUp);
     }
