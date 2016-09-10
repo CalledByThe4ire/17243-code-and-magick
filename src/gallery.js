@@ -23,37 +23,43 @@ function Gallery(picturesList) {
   this.pictures = picturesList;
   this.picturesCount.textContent = this.pictures.length;
 
+  window.addEventListener('hashchange', this.onHashChange.bind(this));
+
   this.hide = this.hide.bind(this);
   this.prev = this.prev.bind(this);
   this.next = this.next.bind(this);
 }
 
 /**
- * Устанавливает изображение, предшествующее текущему,
+ * Записывает в адресную строку url изображения, предшествующее текущему,
  * пока верно условие
  */
 Gallery.prototype.prev = function() {
   if (this.activePicture !== 0) {
-    this.setActivePicture(this.activePicture - 1);
+    this.setLocationHash(this.pictures[this.activePicture - 1]);
   }
 };
 
 /**
- * Устанавливает изображение, следующее за текущим,
+ * Записывает в адресную строку url изображения, следующее за текущим,
  * пока верно условие
  */
 Gallery.prototype.next = function() {
   if (this.activePicture !== this.pictures.length - 1) {
-    this.setActivePicture(this.activePicture + 1);
+    this.setLocationHash(this.pictures[this.activePicture + 1]);
   }
 };
 
 /**
  * Отрисовывает изображение
- * @param number
+ * @param {Number | String} data
  */
-Gallery.prototype.setActivePicture = function(number) {
-  this.activePicture = number;
+Gallery.prototype.setActivePicture = function(data) {
+  if (typeof data !== 'number') {
+    data = this.pictures.indexOf(data);
+  }
+
+  this.activePicture = data;
 
   var pictureElement = new Image();
   pictureElement.src = this.pictures[this.activePicture];
@@ -65,31 +71,53 @@ Gallery.prototype.setActivePicture = function(number) {
   }
 
   this.pictureElement = pictureElement;
+  this.currentPicture.textContent = data + 1;
+};
 
-  this.currentPicture.textContent = number + 1;
+/**
+ * Записывает в адресную строку переданный url
+ * @param {String} url
+ */
+Gallery.prototype.setLocationHash = function(url) {
+  location.hash = 'photo/' + url;
+};
+
+/**
+ * В зависимости от состояния адресной строки
+ * вызывает на объекте соответствующий метод
+ */
+Gallery.prototype.onHashChange = function() {
+  var correctPath = location.hash.match(/#photo\/(\S+)/);
+  if (correctPath) {
+    this.show(correctPath[1]);
+  } else {
+    this.hide();
+  }
 };
 
 /**
  * Открывает галерею по клику на изображение,
  * добавляет обработчики событий управляющим элементам галереи
- * @param {Number} number: порядковый номер (индекс) изображения
+ * @param {(Number | String)}  data: порядковый номер (индекс) изображения или url изображения
  */
-Gallery.prototype.show = function(number) {
+Gallery.prototype.show = function(data) {
   this.closeGallery.addEventListener('click', this.hide);
   this.toggleLeft.addEventListener('click', this.prev);
   this.toggleRight.addEventListener('click', this.next);
-  this.setActivePicture(number);
+  this.setActivePicture(data);
   this.galleryContainer.classList.remove('invisible');
 };
 
 /**
- * Прячет галерею, удаляет обработчики событий на управляющих элементах
+ * Прячет галерею, очищает адресную строку,
+ * удаляет обработчики событий на управляющих элементах
  */
 Gallery.prototype.hide = function() {
   this.galleryContainer.classList.add('invisible');
   this.closeGallery.removeEventListener('click', this.hide);
   this.toggleLeft.removeEventListener('click', this.prev);
   this.toggleRight.removeEventListener('click', this.next);
+  location.hash = '';
 };
 
 module.exports = Gallery;
