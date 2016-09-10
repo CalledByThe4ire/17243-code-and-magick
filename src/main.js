@@ -17,7 +17,7 @@ var gallery = new Gallery(picturesURL);
 
 Array.prototype.forEach.call(linksList, function(elem, i) {
   elem.addEventListener('click', function() {
-    gallery.show(i);
+    gallery.setLocationHash(picturesURL[i]);
   });
 });
 
