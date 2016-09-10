@@ -9,9 +9,6 @@
  */
 function Gallery(picturesList) {
 
-  // сохраняем контекст для ссылки на объект в обработчиках
-  var self = this;
-
   var overlay = document.querySelector('.overlay-gallery');
   this.galleryContainer = overlay;
   this.pictureContainer = overlay.querySelector('.overlay-gallery-preview');
@@ -26,29 +23,9 @@ function Gallery(picturesList) {
   this.pictures = picturesList;
   this.picturesCount.textContent = this.pictures.length;
 
-  /**
-   * Добавляет обработчику onCloseClickHandler метод закрытия галереи,
-   * указанный в прототипе: контекст берется из замыкания
-   */
-  this.onCloseClickHandler = function() {
-    self.hide();
-  };
-
-  /**
-   * Добавляет обработчику onToggleLeftClickHandler метод из прототипа,
-   * отвечающий за показ предыдущего изображения: контекст берется из замыкания
-   */
-  this.onToggleLeftClickHandler = function() {
-    self.prev();
-  };
-
-  /**
-   * Добавляет обработчику onToggleRightClickHandler метод из прототипа,
-   * отвечающий за показ следующего изображения: контекст берется из замыкания
-   */
-  this.onToggleRightClickHandler = function() {
-    self.next();
-  };
+  this.hide = this.hide.bind(this);
+  this.prev = this.prev.bind(this);
+  this.next = this.next.bind(this);
 }
 
 /**
@@ -98,9 +75,9 @@ Gallery.prototype.setActivePicture = function(number) {
  * @param {Number} number: порядковый номер (индекс) изображения
  */
 Gallery.prototype.show = function(number) {
-  this.closeGallery.addEventListener('click', this.onCloseClickHandler);
-  this.toggleLeft.addEventListener('click', this.onToggleLeftClickHandler);
-  this.toggleRight.addEventListener('click', this.onToggleRightClickHandler);
+  this.closeGallery.addEventListener('click', this.hide);
+  this.toggleLeft.addEventListener('click', this.prev);
+  this.toggleRight.addEventListener('click', this.next);
   this.setActivePicture(number);
   this.galleryContainer.classList.remove('invisible');
 };
@@ -110,9 +87,9 @@ Gallery.prototype.show = function(number) {
  */
 Gallery.prototype.hide = function() {
   this.galleryContainer.classList.add('invisible');
-  this.closeGallery.removeEventListener('click', this.onCloseClickHandler);
-  this.toggleLeft.removeEventListener('click', this.onToggleLeftClickHandler);
-  this.toggleRight.removeEventListener('click', this.onToggleRightClickHandler);
+  this.closeGallery.removeEventListener('click', this.hide);
+  this.toggleLeft.removeEventListener('click', this.prev);
+  this.toggleRight.removeEventListener('click', this.next);
 };
 
 module.exports = Gallery;
