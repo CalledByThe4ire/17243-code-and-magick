@@ -30,7 +30,6 @@ var reviewToClone = (('content' in templateElement) ?
  * @constructor
  */
 var Review = function(data) {
-  var self = this;
   this.data = data;
   this.element = reviewToClone.cloneNode(true);
 
@@ -47,25 +46,23 @@ var Review = function(data) {
 
   loadImage(data.author.picture, function(isOk) {
     if (isOk) {
-      img.src = self.data.author.picture;
+      img.src = this.data.author.picture;
       img.width = imgWidth;
       img.height = imgHeight;
     } else {
-      self.element.classList.add('review-load-failure');
+      this.element.classList.add('review-load-failure');
     }
-  });
+  }.bind(this));
 
   this.element.querySelector('.review-text').textContent = this.data.description;
   this.reviewQuiz = this.element.querySelector('.review-quiz');
   this.quizAnswerYes = this.element.querySelector('.review-quiz-answer-yes');
   this.quizAnswerNo = this.element.querySelector('.review-quiz-answer-no');
 
-  this.onQuizClickHandler = function(event) {
-    self.setQuizState(event);
-  };
+  this.setQuizState = this.setQuizState.bind(this);
 
-  this.quizAnswerYes.addEventListener('click', this.onQuizClickHandler);
-  this.quizAnswerNo.addEventListener('click', this.onQuizClickHandler);
+  this.quizAnswerYes.addEventListener('click', this.setQuizState);
+  this.quizAnswerNo.addEventListener('click', this.setQuizState);
 };
 
 /**
@@ -84,8 +81,8 @@ Review.prototype.setQuizState = function(event) {
  * Удаляет обработчики с элементов выбора варианта ответа
  */
 Review.prototype.remove = function() {
-  this.quizAnswerYes.removeEventListener('click', this.onQuizClickHandler);
-  this.quizAnswerNo.removeEventListener('click', this.onQuizClickHandler);
+  this.quizAnswerYes.removeEventListener('click', this.setQuizState);
+  this.quizAnswerNo.removeEventListener('click', this.setQuizState);
 };
 
 module.exports = Review;

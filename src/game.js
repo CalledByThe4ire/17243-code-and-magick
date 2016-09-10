@@ -263,6 +263,8 @@ var Game = function(container) {
 
   this.setDeactivated(false);
 
+  this._onScroll = this._onScroll.bind(this);
+
   this._addParallax();
 };
 
@@ -402,8 +404,6 @@ Game.prototype = {
    * в зависимости от положения прокрутки
    */
   _addParallax: function() {
-    var self = this;
-
     /**
      * Получает координаты элемента относительно страницы
      * http://learn.javascript.ru/coordinates-document
@@ -423,19 +423,21 @@ Game.prototype = {
 
     this.mainCoords = getCoords(main);
 
-    window.addEventListener('scroll', function() {
-      var scrollAmount = self.mainCoords.top - window.pageYOffset;
-      if (Date.now() - self.lastFunctionCall >= self.THROTTLE_TIMEOUT) {
-        if ( scrollAmount < 0) {
-          self.parallax = false;
-          self.setGameStatus(Verdict.PAUSE);
-        }
-        self.lastFunctionCall = Date.now();
-      }
-      self.parallax = true;
-      self._enableParallax();
-    });
+    window.addEventListener('scroll', this._onScroll);
 
+  },
+
+  _onScroll: function() {
+    var scrollAmount = this.mainCoords.top - window.pageYOffset;
+    if (Date.now() - this.lastFunctionCall >= this.THROTTLE_TIMEOUT) {
+      if ( scrollAmount < 0) {
+        this.parallax = false;
+        this.setGameStatus(Verdict.PAUSE);
+      }
+      this.lastFunctionCall = Date.now();
+    }
+    this.parallax = true;
+    this._enableParallax();
   },
 
   _enableParallax: function() {
@@ -496,8 +498,6 @@ Game.prototype = {
     /**
      * блок с переменными
      */
-    var self = this;
-
     var rectWidth = 300;
     var rectX = 300; // X-координата начала
     var rectY = 50; // Y-координата начала
@@ -508,7 +508,7 @@ Game.prototype = {
     var lineHeight = fontSize * 1.2;
 
     // вычисляем ширину символа
-    var SYMBOL_WIDTH = self.ctx.measureText('M').width;
+    var SYMBOL_WIDTH = this.ctx.measureText('M').width;
 
     // вычисляем ширину сообщения с учетом отступов
     var messageLength = (rectWidth - (padding * 2)) / SYMBOL_WIDTH;
@@ -524,20 +524,20 @@ Game.prototype = {
      * @param {Number} width ширина прямоугольника
      * @param {Number} height высота прямоугольника
      */
-    function createRect(x, y, width, height) {
+    var createRect = function(x, y, width, height) {
       // 1. тень от прямоугольника
-      self.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-      self.ctx.fillRect(x + padding, y + padding, width, height);
+      this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+      this.ctx.fillRect(x + padding, y + padding, width, height);
 
       // 2. прямоугольник: обводка
-      self.ctx.strokeStyle = '#000';
-      self.ctx.lineWidth = 5;
-      self.ctx.strokeRect(x, y, width, height);
+      this.ctx.strokeStyle = '#000';
+      this.ctx.lineWidth = 5;
+      this.ctx.strokeRect(x, y, width, height);
 
       // 3. прямоугольник: заливка
-      self.ctx.fillStyle = '#fff';
-      self.ctx.fillRect(x, y, width, height);
-    }
+      this.ctx.fillStyle = '#fff';
+      this.ctx.fillRect(x, y, width, height);
+    }.bind(this);
 
     createRect(rectX, rectY, rectWidth, messageHeight + padding * 2);
 
@@ -545,15 +545,15 @@ Game.prototype = {
      * Функция вывода сообщения на холст.
      * @param {String} element Строка, которая передается ctx-объекту fillText
      */
-    function createMessage(element) {
+    var createMessage = function(element) {
       // параметры шрифта
-      self.ctx.textAlign = 'center';
-      self.ctx.textBaseline = 'top';
-      self.ctx.fillStyle = '#000';
+      this.ctx.textAlign = 'center';
+      this.ctx.textBaseline = 'top';
+      this.ctx.fillStyle = '#000';
 
-      self.ctx.fillText(element, rectX + rectWidth / 2, rectY + padding);
+      this.ctx.fillText(element, rectX + rectWidth / 2, rectY + padding);
       rectY += lineHeight;
-    }
+    }.bind(this);
 
     /**
      * Функция создания из строки массива заданной ширины:
