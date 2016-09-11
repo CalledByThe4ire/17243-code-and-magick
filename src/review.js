@@ -2,6 +2,7 @@
 
 var utils = require('./utils');
 var BaseComponent = require('./base-component');
+var ReviewData = require('./review-data');
 var loadImage = require('./load-image');
 
 /**
@@ -15,24 +16,13 @@ var reviewToClone = (('content' in templateElement) ?
   .querySelector('.review');
 
 /**
- * @typedef {Object} ReviewData
- * Отзыв
- * @property {Object} author
- * @property {String} author.name
- * @property {String} author.picture
- * @property {Number} review_usefulness
- * @property {Number} rating
- * @property {String} description
- */
-
-/**
  * Создает элемент {Review} на основе шаблона,
- * описанного в теге template с данными {ReviewData}, пришедшими с сервера
+ * описанного в теге template с данными {ReviewData}
  * @param {ReviewData} data
  * @constructor
  */
 var Review = function(data) {
-  this.data = data;
+  this.data = new ReviewData(data);
   // наследует св-ва и методы, объявленные в конструкторе BaseComponent
   // в данном случае в св-во element, унаследованное от BaseComponent,
   // запишутся данные, переданные в методе call 2-м параметром
@@ -40,18 +30,18 @@ var Review = function(data) {
 
   var rating = this.element.querySelector('.review-rating');
   var ratingMarks = ['', '-two', '-three', '-four', '-five'];
-  rating.classList.add('review-rating' + ratingMarks[this.data.rating - 1]);
+  rating.classList.add('review-rating' + ratingMarks[this.data.getReviewMark() - 1]);
 
   var img = this.element.querySelector('.review-author');
   var imgWidth = 124;
   var imgHeight = 124;
 
-  img.alt = img.title = this.data.author.name;
+  img.alt = img.title = this.data.getAuthorName();
 
 
-  loadImage(data.author.picture, function(isOk) {
+  loadImage(this.data.getAuthorPic(), function(isOk) {
     if (isOk) {
-      img.src = this.data.author.picture;
+      img.src = this.data.getAuthorPic();
       img.width = imgWidth;
       img.height = imgHeight;
     } else {
@@ -59,7 +49,7 @@ var Review = function(data) {
     }
   }.bind(this));
 
-  this.element.querySelector('.review-text').textContent = this.data.description;
+  this.element.querySelector('.review-text').textContent = this.data.getReviewDescription();
   this.reviewQuiz = this.element.querySelector('.review-quiz');
   this.quizAnswerYes = this.element.querySelector('.review-quiz-answer-yes');
   this.quizAnswerNo = this.element.querySelector('.review-quiz-answer-no');
@@ -75,14 +65,18 @@ utils.inherit(Review, BaseComponent);
 
 /**
  * Делает активным выбранный вариант ответа
- * @param {MouseEvent} event
+ * @param {MouseEvent} evt
  */
-Review.prototype.setQuizState = function(event) {
+Review.prototype.setQuizState = function(evt) {
+  var flag;
   var quizActive = this.reviewQuiz.querySelector('.review-quiz-answer-active');
   if (quizActive !== null) {
     quizActive.classList.remove('review-quiz-answer-active');
   }
-  event.target.classList.add('review-quiz-answer-active');
+  evt.target.classList.add('review-quiz-answer-active');
+
+  flag = evt.target.classList.contains('review-quiz-answer-yes');
+  this.data.setReviewUsefulness(flag);
 };
 
 /**
