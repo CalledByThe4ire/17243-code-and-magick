@@ -1,5 +1,7 @@
 'use strict';
 
+var utils = require('./utils');
+var BaseComponent = require('./base-component');
 var loadImage = require('./load-image');
 
 /**
@@ -31,7 +33,10 @@ var reviewToClone = (('content' in templateElement) ?
  */
 var Review = function(data) {
   this.data = data;
-  this.element = reviewToClone.cloneNode(true);
+  // наследует св-ва и методы, объявленные в конструкторе BaseComponent
+  // в данном случае в св-во element, унаследованное от BaseComponent,
+  // запишутся данные, переданные в методе call 2-м параметром
+  BaseComponent.call(this, reviewToClone.cloneNode(true));
 
   var rating = this.element.querySelector('.review-rating');
   var ratingMarks = ['', '-two', '-three', '-four', '-five'];
@@ -65,6 +70,9 @@ var Review = function(data) {
   this.quizAnswerNo.addEventListener('click', this.setQuizState);
 };
 
+// записывает в св-во __proto__ объекта Review ссылку на BaseComponent
+utils.inherit(Review, BaseComponent);
+
 /**
  * Делает активным выбранный вариант ответа
  * @param {MouseEvent} event
@@ -83,6 +91,9 @@ Review.prototype.setQuizState = function(event) {
 Review.prototype.remove = function() {
   this.quizAnswerYes.removeEventListener('click', this.setQuizState);
   this.quizAnswerNo.removeEventListener('click', this.setQuizState);
+  // расширяет метод remove, добавляя логику из аналогичного метода,
+  // описанную в объекте prototype класса BaseComponent
+  BaseComponent.prototype.remove.call(this);
 };
 
 module.exports = Review;
