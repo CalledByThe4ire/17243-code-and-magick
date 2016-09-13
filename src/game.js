@@ -1,5 +1,7 @@
 'use strict';
 
+var utils = require('./utils');
+
 /**
  * @const
  * @type {number}
@@ -253,7 +255,6 @@ var Game = function(container) {
   this.ctx = this.canvas.getContext('2d');
 
   this.THROTTLE_TIMEOUT = 100;
-  this.lastFunctionCall = 0;
 
   this.parallax = true;
 
@@ -424,20 +425,20 @@ Game.prototype = {
     this.mainCoords = getCoords(main);
 
     window.addEventListener('scroll', this._onScroll);
-
+    window.addEventListener('scroll', utils.throttle(this._checkScrollAmount.bind(this), this.THROTTLE_TIMEOUT));
   },
 
   _onScroll: function() {
-    var scrollAmount = this.mainCoords.top - window.pageYOffset;
-    if (Date.now() - this.lastFunctionCall >= this.THROTTLE_TIMEOUT) {
-      if ( scrollAmount < 0) {
-        this.parallax = false;
-        this.setGameStatus(Verdict.PAUSE);
-      }
-      this.lastFunctionCall = Date.now();
-    }
     this.parallax = true;
     this._enableParallax();
+  },
+
+  _checkScrollAmount: function() {
+    var scrollAmount = this.mainCoords.top - window.pageYOffset;
+    if ( scrollAmount < 0) {
+      this.parallax = false;
+      this.setGameStatus(Verdict.PAUSE);
+    }
   },
 
   _enableParallax: function() {
