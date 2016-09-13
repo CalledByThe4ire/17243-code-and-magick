@@ -10,5 +10,21 @@ module.exports = {
    */
   inherit: function(childObj, parentObj) {
     childObj.prototype = Object.create(parentObj.prototype);
+  },
+  /**
+   * Выполняет функцию fn не чаще одного раза в указанный в параметре delay период,
+   * даже если она будет вызвана неоднократно в течение указанного периода
+   * @param {Function} fn
+   * @param {Number} delay
+   * @return {Function}
+     */
+  throttle: function(fn, delay) {
+    var thisMoment = 0;
+    return function() {
+      if ( Date.now() - thisMoment > delay ) {
+        fn();
+        thisMoment = Date.now();
+      }
+    };
   }
 };
