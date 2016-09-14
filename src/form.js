@@ -11,6 +11,7 @@ var formCloseButton = document.querySelector('.review-form-close');
 var reviewForm = document.querySelector('.review-form');
 
 var rating = reviewForm.elements['review-mark'];
+var ratingValue = '';
 
 var nameField = reviewForm.elements['review-name'];
 var feedbackField = reviewForm.elements['review-text'];
@@ -22,18 +23,57 @@ var hintFeedback = hintsContainer.querySelector('.review-fields-text');
 var submitBtn = reviewForm.querySelector('.review-submit');
 
 /**
+ * Возвращает значение свойства value элемента коллекции,
+ * значение атрибута checked которого установлено в true
+ * @param {NodeList} nodeList
+ * @returns {String}
+ */
+var getRadioValue = function(nodeList) {
+  for (var i = 0; i < nodeList.length; i++) {
+    if (nodeList[i].checked) {
+      return nodeList[i].value;
+    }
+  }
+  return null;
+};
+
+/**
+ * Возвращает элемент коллекции с указанным в параметре value значением,
+ * и устанавливает свойство checked элемента в true
+ * @param {NodeList} nodeList
+ * @param {String} value
+ * @returns {HTMLElement}
+ */
+var setRadioValue = function(nodeList, value) {
+
+  if (typeof value === 'number') {
+    value = String(value);
+  }
+  for (var i = 0; i < nodeList.length; i++) {
+    if (nodeList[i].value === value) {
+      nodeList[i].checked = true;
+      return nodeList[i];
+    }
+  }
+  return null;
+};
+
+/**
  * начальные значения формы review-form
  */
 nameField.required = true;
 
+ratingValue = getRadioValue(rating);
+
 function validateForm() {
+
 
   /**
    * делаем поле отзыва обязательным в зависимости от
    * выставленной оценки
    */
   // true только, если рейтинг ниже 3
-  feedbackField.required = rating.value < 3;
+  feedbackField.required = ratingValue < 3;
 
   /**
    * создаем переменные isNameValid и isFeedbackValid, равные true,
@@ -130,7 +170,7 @@ function getExpiresDate(month, date) {
 /**
  * сохраняем выбранные значения в cookies
  */
-rating.value = browserCookies.get('review-mark') || rating.value;
+setRadioValue(rating, browserCookies.get('review-mark') || ratingValue);
 
 nameField.value = browserCookies.get('review-name') || nameField.value;
 
