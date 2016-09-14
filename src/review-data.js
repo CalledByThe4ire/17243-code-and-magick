@@ -48,6 +48,10 @@ ReviewData.prototype.getReviewUsefulness = function() {
   return this.reviewUsefulness;
 };
 
+ReviewData.prototype.onUsefulnessChange = function() {
+
+};
+
 /**
  * Изменяет св-во reviewUsefulness
  * в зависимости от переданного значения
@@ -59,6 +63,7 @@ ReviewData.prototype.setReviewUsefulness = function(flag) {
   } else {
     this.reviewUsefulness--;
   }
+  this.onUsefulnessChange(flag);
 };
 
 module.exports = ReviewData;

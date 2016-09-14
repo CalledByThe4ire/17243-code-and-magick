@@ -50,41 +50,52 @@ var Review = function(data) {
   }.bind(this));
 
   this.element.querySelector('.review-text').textContent = this.data.getReviewDescription();
-  this.reviewQuiz = this.element.querySelector('.review-quiz');
   this.quizAnswerYes = this.element.querySelector('.review-quiz-answer-yes');
   this.quizAnswerNo = this.element.querySelector('.review-quiz-answer-no');
 
-  this.setQuizState = this.setQuizState.bind(this);
+  this.updateUsefulness = this.updateUsefulness.bind(this);
 
-  this.quizAnswerYes.addEventListener('click', this.setQuizState);
-  this.quizAnswerNo.addEventListener('click', this.setQuizState);
+  this.quizAnswerYes.addEventListener('click', this.updateUsefulness);
+  this.quizAnswerNo.addEventListener('click', this.updateUsefulness);
+
+  // Вызываем на ReviewData метод setAnswerActive в случае,
+  // если меняется "полезность" (onChangeUsefulness)
+  this.data.onUsefulnessChange = this.setAnswerActive.bind(this);
+
 };
 
 // записывает в св-во __proto__ объекта Review ссылку на BaseComponent
 utils.inherit(Review, BaseComponent);
 
 /**
- * Делает активным выбранный вариант ответа
+ * Передает в параметр функции обратного вызова setReviewUsefulness
+ * логическое значение, в зависимости от которого меняется
+ * свойство reviewUsefulness объекта ReviewData
+ *
  * @param {MouseEvent} evt
  */
-Review.prototype.setQuizState = function(evt) {
-  var flag;
-  var quizActive = this.reviewQuiz.querySelector('.review-quiz-answer-active');
-  if (quizActive !== null) {
-    quizActive.classList.remove('review-quiz-answer-active');
-  }
-  evt.target.classList.add('review-quiz-answer-active');
-
-  flag = evt.target.classList.contains('review-quiz-answer-yes');
+Review.prototype.updateUsefulness = function(evt) {
+  var flag = evt.target.classList.contains('review-quiz-answer-yes');
   this.data.setReviewUsefulness(flag);
+};
+
+Review.prototype.quizAnswerActive = 'review-quiz-answer-active';
+
+/**
+ * Отмечает один из вариантов ответа ("Да" или "Нет")
+ * @param {Boolean} flag
+ */
+Review.prototype.setAnswerActive = function(flag) {
+  this.quizAnswerYes.classList.toggle(this.quizAnswerActive, flag);
+  this.quizAnswerNo.classList.toggle(this.quizAnswerActive, !flag);
 };
 
 /**
  * Удаляет обработчики с элементов выбора варианта ответа
  */
 Review.prototype.remove = function() {
-  this.quizAnswerYes.removeEventListener('click', this.setQuizState);
-  this.quizAnswerNo.removeEventListener('click', this.setQuizState);
+  this.quizAnswerYes.removeEventListener('click', this.updateUsefulness);
+  this.quizAnswerNo.removeEventListener('click', this.updateUsefulness);
   // расширяет метод remove, добавляя логику из аналогичного метода,
   // описанную в объекте prototype класса BaseComponent
   BaseComponent.prototype.remove.call(this);
